@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OrganikHaberlesme.Domain\OrganikHaberlesme.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Persistance\" />
+    <None Remove="Profiles\" />
+    <None Remove="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <None Remove="DTOs\" />
+    <None Remove="DTOs\Common\" />
+    <None Remove="DTOs\LeaveRequest\" />
+    <None Remove="Persistance\Contracts\" />
+    <None Remove="MediatR.Extensions.Microsoft.DependencyInjection" />
+    <None Remove="Features\" />
+    <None Remove="Features\LeaveType\" />
+    <None Remove="Features\LeaveRequest\" />
+    <None Remove="Features\LeaveAllocation\" />
+    <None Remove="Features\LeaveTypes\Requests\" />
+    <None Remove="Features\LeaveTypes\Handlers\" />
+    <None Remove="Features\LeaveTypes\Handlers\Commands\" />
+    <None Remove="Features\LeaveTypes\Handlers\Queries\" />
+    <None Remove="Features\LeaveTypes\Requests\Commands\" />
+    <None Remove="Features\LeaveTypes\Requests\Queries\" />
+    <None Remove="Features\LeaveAllocations\Handlers\" />
+    <None Remove="Features\LeaveAllocations\Requests\" />
+    <None Remove="Features\LeaveRequests\Handlers\" />
+    <None Remove="Features\LeaveRequests\Requests\" />
+    <None Remove="Features\LeaveAllocations\Handlers\Commands\" />
+    <None Remove="Features\LeaveAllocations\Handlers\Queries\" />
+    <None Remove="Features\LeaveAllocations\Requests\Commands\" />
+    <None Remove="Features\LeaveAllocations\Requests\Queries\" />
+    <None Remove="Features\LeaveRequests\Handlers\Commands\" />
+    <None Remove="Features\LeaveRequests\Handlers\Queries\" />
+    <None Remove="Features\LeaveRequests\Requests\Commands\" />
+    <None Remove="Features\LeaveRequests\Requests\Queries\" />
+    <None Remove="DTOs\LeaveAllocation\" />
+    <None Remove="DTOs\LeaveType\" />
+    <None Remove="FluentValidation.DependencyInjectionExtensions" />
+    <None Remove="DTOs\LeaveType\Validators\" />
+    <None Remove="DTOs\LeaveRequest\Validators\" />
+    <None Remove="DTOs\LeaveAllocation\Validators\" />
+    <None Remove="Exceptions\" />
+    <None Remove="Responses\" />
+    <None Remove="Contracts\Infrastructure\" />
+    <None Remove="Models\" />
+    <None Remove="Microsoft.EntityFrameworkCore.Tools" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Profiles\" />
+    <Folder Include="DTOs\Common\" />
+    <Folder Include="Features\" />
+    <Folder Include="Features\LeaveTypes\" />
+    <Folder Include="Features\LeaveRequests\" />
+    <Folder Include="Features\LeaveAllocations\" />
+    <Folder Include="Features\LeaveTypes\Requests\" />
+    <Folder Include="Features\LeaveTypes\Handlers\" />
+    <Folder Include="Features\LeaveTypes\Handlers\Commands\" />
+    <Folder Include="Features\LeaveTypes\Handlers\Queries\" />
+    <Folder Include="Features\LeaveTypes\Requests\Commands\" />
+    <Folder Include="Features\LeaveTypes\Requests\Queries\" />
+    <Folder Include="Features\LeaveAllocations\Handlers\" />
+    <Folder Include="Features\LeaveAllocations\Requests\" />
+    <Folder Include="Features\LeaveRequests\Handlers\" />
+    <Folder Include="Features\LeaveRequests\Requests\" />
+    <Folder Include="Features\LeaveAllocations\Handlers\Commands\" />
+    <Folder Include="Features\LeaveAllocations\Handlers\Queries\" />
+    <Folder Include="Features\LeaveAllocations\Requests\Commands\" />
+    <Folder Include="Features\LeaveAllocations\Requests\Queries\" />
+    <Folder Include="Features\LeaveRequests\Handlers\Commands\" />
+    <Folder Include="Features\LeaveRequests\Handlers\Queries\" />
+    <Folder Include="Features\LeaveRequests\Requests\Commands\" />
+    <Folder Include="Features\LeaveRequests\Requests\Queries\" />
+    <Folder Include="DTOs\LeaveAllocation\" />
+    <Folder Include="DTOs\LeaveType\" />
+    <Folder Include="DTOs\LeaveType\Validators\" />
+    <Folder Include="DTOs\LeaveAllocation\Validators\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Responses\" />
+    <Folder Include="Contracts\Infrastructure\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.3.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+</Project>

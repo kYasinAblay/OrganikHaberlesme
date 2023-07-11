@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\OrganikHaberlesme.Application\OrganikHaberlesme.Application.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\OrganikHaberlesme.Identity\OrganikHaberlesme.Identity.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\OrganikHaberlesme.Infrastructure\OrganikHaberlesme.Infrastructure.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\OrganikHaberlesme.Persistence\OrganikHaberlesme.Persistence.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Swashbuckle.AspNetCore.SwaggerGen" />
+    <None Remove="Microsoft.EntityFrameworkCore.Tools" />
+    <None Remove="Swashbuckle.AspNetCore.Swagger" />
+    <None Remove="Swashbuckle.AspNetCore.SwaggerUI" />
+    <None Remove="MediatR" />
+    <None Remove="Microsoft.VisualStudio.Web.CodeGeneration.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.2.3" />
+    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0" />
+  </ItemGroup>
+</Project>
