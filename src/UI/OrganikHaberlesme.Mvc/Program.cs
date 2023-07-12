@@ -17,6 +17,8 @@ using Microsoft.Extensions.Configuration;
 using OrganikHaberlesme.Application.Models.Email;
 using OrganikHaberlesme.Application.Contracts.Infrastructure;
 using OrganikHaberlesme.Infrastructure.Mail;
+using OrganikHaberlesme.Mvc.ExternalServices.Services.IServices;
+using OrganikHaberlesme.Mvc.ExternalServices.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,8 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 
+builder.Services.AddHttpClient<IOrganikSmsService, OrganikSmsService>();
+builder.Services.AddScoped<IOrganikSmsService, OrganikSmsService>();
 builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddHttpClient<IClient, Client>(cl => cl.BaseAddress = new Uri("https://localhost:44345"));
@@ -38,6 +42,7 @@ builder.Services.AddScoped<ILeaveAllocationService, LeaveAllocationService>();
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<ISmsSender, MessageSender>();
 builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
 
 builder.Services.AddHangfire(config => config.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
@@ -52,7 +57,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
+   app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 

@@ -102,7 +102,7 @@ namespace OrganikHaberlesme.Identity.Services
 
             var token = await _userManager.GenerateTwoFactorTokenAsync(user, provider);
 
-            return new VerificationNotify { Code = token, MailTo = user.Email };
+            return new VerificationNotify { Code = token, MailTo = user.Email, PhoneNumber = user.PhoneNumber };
         }
 
         public async Task<RegistrationResponse> Register(RegistrationRequest request)
@@ -127,8 +127,10 @@ namespace OrganikHaberlesme.Identity.Services
                 FirstName = "",
                 LastName = "",
                 EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
                 TwoFactorEnabled = true
             };
+
             try
             {
                 var result = await _userManager.CreateAsync(user, request.Password);

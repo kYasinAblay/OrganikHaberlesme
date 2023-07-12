@@ -9,6 +9,11 @@ using OrganikHaberlesme.Mvc.BackgroundJobs;
 
 using Microsoft.Extensions.Options;
 using OrganikHaberlesme.Mvc.Services.Base;
+using OrganikHaberlesme.Mvc.ExternalServices.Model.OrganikAPI;
+using OrganikHaberlesme.Mvc.ExternalServices.Enums;
+using System;
+using OrganikHaberlesme.Mvc.ExternalServices.Extension;
+using System.Collections.Generic;
 
 namespace OrganikHaberlesme.Mvc.Controllers
 {
@@ -20,7 +25,6 @@ namespace OrganikHaberlesme.Mvc.Controllers
         {
             _authService = authService;
             _localStorageService = localStorageService;
-
         }
 
         [HttpGet]
@@ -38,6 +42,7 @@ namespace OrganikHaberlesme.Mvc.Controllers
 
                 var isLoggedIn = await _authService.Authenticate(login.Email, login.Password);
 
+                //null ise login işlemi devam ediyor demektir. 2FA
                 if (isLoggedIn == null)
                 {
                     return RedirectToAction(nameof(ProviderSelection));
@@ -54,23 +59,20 @@ namespace OrganikHaberlesme.Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> GetGenerateCode(string provider)
         {
-
             if (!string.IsNullOrEmpty(provider))
             {
                 VerificationNotify verification = await _authService.GetLogin2FACode(provider);
-
-                if (provider == "Email")
+                switch (provider.ToEnum<Provider>())
                 {
-                    FireAndForget.EmailSendToUser(verification);
-                }  //else if (provider == "SMS")
-                   //{
-                   //    FireAndForget.EmailSendToUser(new VerificationNotify
-                   //    {
-                   //        Code = code,
-                   //        MailTo = User.Identity.Name,
-                   //        Message = "Doğrulama Kodu"
-                   //    });
-                   //}
+                    case Provider.Phone:
+                        FireAndForget.SMSSendToUser(verification);
+                        break;
+                    case Provider.Email:
+                    default:
+                        FireAndForget.EmailSendToUser(verification);
+                        break;
+                }
+
                 return Json(verification.Code);
             }
             return Json("-1");
@@ -96,7 +98,7 @@ namespace OrganikHaberlesme.Mvc.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVm registration)
-        {
+        {// TO DO: geri dönüşler detaylandırılacak
             if (ModelState.IsValid)
             {
                 var returnUrl = Url.Content("~/");
