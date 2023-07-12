@@ -13,6 +13,9 @@ using OrganikHaberlesme.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OrganikHaberlesme.Application.Responses;
+using Microsoft.AspNetCore.Http;
+using OrganikHaberlesme.Application.Models.VerificationCode;
 
 namespace OrganikHaberlesme.Identity.Services
 {
@@ -42,6 +45,16 @@ namespace OrganikHaberlesme.Identity.Services
             }
 
             var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
+
+
+            if (result.RequiresTwoFactor && !result.Succeeded)
+            {
+                return new AuthResponse
+                {
+                    Data = result,
+                };
+            }
+
             if (!result.Succeeded)
             {
                 throw new Exception($"Credentials for '{request.Email}' aren't valid.");
@@ -58,6 +71,38 @@ namespace OrganikHaberlesme.Identity.Services
             };
 
             return response;
+        }
+        public async Task<AuthResponse> OtpLogin(AuthOptions options)
+        {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+
+            var result = await _signInManager.TwoFactorSignInAsync(options.Provider, options.Code, options.IsPersistence, options.RememberClient);
+
+
+            var jwtSecurityToken = await GenerateToken(user);
+
+            var response = new AuthResponse
+            {
+                Id = user.Id,
+                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                Email = user.Email,
+                UserName = user.UserName,
+            };
+
+            return response;
+        }
+        public async Task<VerificationNotify> GenerateCode(string provider)
+        {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                throw new Exception($"User '{user.Email}' not found.");
+            }
+            var providers = await _userManager.GetValidTwoFactorProvidersAsync(user);
+
+            var token = await _userManager.GenerateTwoFactorTokenAsync(user, provider);
+
+            return new VerificationNotify { Code = token, MailTo = user.Email };
         }
 
         public async Task<RegistrationResponse> Register(RegistrationRequest request)
@@ -79,19 +124,26 @@ namespace OrganikHaberlesme.Identity.Services
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
                 UserName = request.UserName,
+                FirstName = "",
+                LastName = "",
                 EmailConfirmed = true,
                 TwoFactorEnabled = true
             };
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-
-            if (result.Succeeded)
+            try
             {
-                await _userManager.AddToRoleAsync(user, "Employee");
-                return new RegistrationResponse { UserId = user.Id };
-            }
+                var result = await _userManager.CreateAsync(user, request.Password);
 
-            throw new Exception($"{result.Errors}");
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "Employee");
+                    return new RegistrationResponse { UserId = user.Id };
+                }
+                throw new Exception($"{result.Errors}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex.Message}");
+            }
         }
 
         private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
@@ -125,5 +177,7 @@ namespace OrganikHaberlesme.Identity.Services
 
             return jwtSecurityToken;
         }
+
+
     }
 }

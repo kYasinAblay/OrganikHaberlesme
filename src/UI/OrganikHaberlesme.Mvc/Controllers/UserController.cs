@@ -4,16 +4,23 @@ using OrganikHaberlesme.Mvc.Contracts;
 using OrganikHaberlesme.Mvc.Models.User;
 
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol;
+using OrganikHaberlesme.Mvc.BackgroundJobs;
+
+using Microsoft.Extensions.Options;
+using OrganikHaberlesme.Mvc.Services.Base;
 
 namespace OrganikHaberlesme.Mvc.Controllers
 {
     public class UserController : Controller
     {
         private readonly IAuthenticationService _authService;
-
-        public UserController(IAuthenticationService authService)
+        private readonly ILocalStorageService _localStorageService;
+        public UserController(IAuthenticationService authService, ILocalStorageService localStorageService)
         {
             _authService = authService;
+            _localStorageService = localStorageService;
+
         }
 
         [HttpGet]
@@ -28,8 +35,14 @@ namespace OrganikHaberlesme.Mvc.Controllers
             if (ModelState.IsValid)
             {
                 returnUrl ??= Url.Content("~/");
+
                 var isLoggedIn = await _authService.Authenticate(login.Email, login.Password);
-                if (isLoggedIn)
+
+                if (isLoggedIn == null)
+                {
+                    return RedirectToAction(nameof(ProviderSelection));
+                }
+                if (isLoggedIn == true)
                 {
                     return LocalRedirect(returnUrl);
                 }
@@ -38,7 +51,44 @@ namespace OrganikHaberlesme.Mvc.Controllers
             ModelState.AddModelError(string.Empty, "Log In Attempt Failed. Please try again.");
             return View(login);
         }
+        [HttpPost]
+        public async Task<IActionResult> GetGenerateCode(string provider)
+        {
 
+            if (!string.IsNullOrEmpty(provider))
+            {
+                VerificationNotify verification = await _authService.GetLogin2FACode(provider);
+
+                if (provider == "Email")
+                {
+                    FireAndForget.EmailSendToUser(verification);
+                }  //else if (provider == "SMS")
+                   //{
+                   //    FireAndForget.EmailSendToUser(new VerificationNotify
+                   //    {
+                   //        Code = code,
+                   //        MailTo = User.Identity.Name,
+                   //        Message = "Doğrulama Kodu"
+                   //    });
+                   //}
+                return Json(verification.Code);
+            }
+            return Json("-1");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ProviderSelection(string? returnUrl = null)
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ProviderSelection(AuthOptions options, string? returnUrl)
+        {
+            var authResponse = await _authService.AuthenticateOtp(options);
+            ViewBag.JWTToken = _localStorageService.GetStorageValue<string>("token");
+
+            return View();
+        }
         public IActionResult Register()
         {
             return View();
@@ -54,7 +104,7 @@ namespace OrganikHaberlesme.Mvc.Controllers
                 if (isCreated)
                 {
                     return LocalRedirect(returnUrl);
-                }   
+                }
             }
 
             ModelState.AddModelError("", "Registration Attempt Failed. Please try again.");

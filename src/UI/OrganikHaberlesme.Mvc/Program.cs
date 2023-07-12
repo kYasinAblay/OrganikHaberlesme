@@ -11,6 +11,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Hangfire;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
+using OrganikHaberlesme.Application.Models.Email;
+using OrganikHaberlesme.Application.Contracts.Infrastructure;
+using OrganikHaberlesme.Infrastructure.Mail;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +36,12 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
 builder.Services.AddScoped<ILeaveAllocationService, LeaveAllocationService>();
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddSingleton<ILocalStorageService, LocalStorageService>();
+
+builder.Services.AddHangfire(config => config.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+builder.Services.AddHangfireServer();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -55,6 +65,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseHangfireDashboard("/hangfire");
 
 app.UseAuthorization();
 

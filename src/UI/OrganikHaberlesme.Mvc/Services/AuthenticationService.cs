@@ -15,6 +15,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 
 using IAuthenticationService = OrganikHaberlesme.Mvc.Contracts.IAuthenticationService;
+using Microsoft.AspNetCore.Identity;
+using OrganikHaberlesme.Application.Models.Email;
+using Newtonsoft.Json;
+using SendGrid;
+using NuGet.Protocol;
+using System.Text.Json;
+
 
 namespace OrganikHaberlesme.Mvc.Services
 {
@@ -35,13 +42,45 @@ namespace OrganikHaberlesme.Mvc.Services
             _mapper = mapper;
             _tokenHandler = new JwtSecurityTokenHandler();
         }
+        public async Task<bool?> AuthenticateOtp(AuthOptions options)
+        {
+            try
+            {
+                var authResponse = await _client.OtpLoginAsync(options);
 
-        public async Task<bool> Authenticate(string email, string password)
+                // Get Claims from token and Build auth user object
+                var tokenContent = _tokenHandler.ReadJwtToken(authResponse.Token);
+                var claims = ParseClaims(tokenContent);
+                var user = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+
+                if (_httpContextAccessor.HttpContext == null)
+                {
+                    return false;
+                }
+
+                await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, user);
+                _localStorage.SetStorageValue("token", authResponse.Token);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool?> Authenticate(string email, string password)
         {
             try
             {
                 var authRequest = new AuthRequest { Email = email, Password = password };
                 var authResponse = await _client.LoginAsync(authRequest);
+
+                var result = ToDictionary<bool>(authResponse.Data);
+
+                if (result != null && result["requiresTwoFactor"] && !result["succeeded"])
+                {
+                    return null;
+                }
 
                 if (string.IsNullOrEmpty(authResponse.Token))
                 {
@@ -100,5 +139,14 @@ namespace OrganikHaberlesme.Mvc.Services
             claims.Add(new Claim(ClaimTypes.Name, tokenContent.Subject));
             return claims;
         }
+
+        public async Task<VerificationNotify> GetLogin2FACode(string provider) => await _client.GenerateCodeAsync(provider);
+        public static Dictionary<string, TValue> ToDictionary<TValue>(object obj)
+        {
+            var json = JsonConvert.SerializeObject(obj);
+            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, TValue>>(json);
+            return dictionary;
+        }
     }
 }
+

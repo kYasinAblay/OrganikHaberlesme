@@ -93,7 +93,8 @@ namespace OrganikHaberlesme.Mvc.Middleware
                     await SignOutAndRedirect(httpContext);
                     break;
                 default:
-                    var path = "/Home/Error";
+                    var path = "/Home/ErrorPartial";
+                    httpContext.Response.HttpContext.Items.Add("Error", $"Hata Alındı.\n{exception.InnerException}: {exception.Message}");
                     httpContext.Response.Redirect(path);
                     break;
             }

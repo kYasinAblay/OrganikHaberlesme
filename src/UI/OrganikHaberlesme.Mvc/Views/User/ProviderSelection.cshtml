@@ -1,0 +1,67 @@
+﻿@using OrganikHaberlesme.Application.Models.Identity;
+@model AuthOptions
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login</h1>
+
+<hr />
+@if (ViewBag.JWTToken != null)
+{
+
+    <div class="alert alert-success text-break" role="alert">
+        <h4>Giriş Başarılı</h4>
+        @ViewBag.JWTToken
+    </div>
+
+    <a class="btn btn-outline-secondary" href="/"> Back to Home</a>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <p class="button-verification">
+                <a class="btn btn-info btn-block" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" name="Email">Email ile Doğrula</a>
+                <a class="btn btn-warning btn-block" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" name="SMS">SMS ile Doğrula</a>
+            </p>
+        </div>
+    </div>
+    
+}
+
+
+<div class="collapse" id="collapseExample">
+    <div class="card card-body">
+        <form asp-action="ProviderSelection" method="post">
+            <input asp-for="Provider" type="hidden" />
+            <div class="form-group">
+                <label asp-for="Code" class="control-label"></label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <button class="btn btn-success mt-3" type="submit">Doğrula</button>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        debugger;
+        $('.button-verification>a').click(function (e) {
+            $.post("GetGenerateCode", { provider: e.target.name }, function (data) {
+                alert(data);
+                console.log(this);
+                console.log(e);
+                $("#Provider").val(e.target.name);
+            });
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
