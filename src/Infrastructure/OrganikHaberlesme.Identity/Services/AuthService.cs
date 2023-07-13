@@ -81,18 +81,24 @@ namespace OrganikHaberlesme.Identity.Services
 
             var result = await _signInManager.TwoFactorSignInAsync(options.Provider, options.Code, options.IsPersistence, options.RememberClient);
 
-
-            var jwtSecurityToken = await GenerateToken(user);
-
-            var response = new AuthResponse
+            if (!result.Succeeded)
             {
-                Id = user.Id,
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                Email = user.Email,
-                UserName = user.UserName,
-            };
+                throw new Exception($"Code '{options.Code}' not compared with sending code.");
+            }
+            else
+            {
+                var jwtSecurityToken = await GenerateToken(user);
 
-            return response;
+                var response = new AuthResponse
+                {
+                    Id = user.Id,
+                    Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                    Email = user.Email,
+                    UserName = user.UserName,
+                };
+
+                return response;
+            }
         }
         public async Task<VerificationNotify> GenerateCode(string provider)
         {
@@ -158,7 +164,7 @@ namespace OrganikHaberlesme.Identity.Services
 
                 validationResult.Errors.Add(new ValidationFailure("Duplicate", errorSb.ToString(), user.Email));
                 throw new ValidationException(validationResult);
-                
+
             }
             catch (ValidationException ex)
             {

@@ -47,9 +47,10 @@ namespace OrganikHaberlesme.Mvc.Services
             try
             {
                 var authResponse = await _client.OtpLoginAsync(options);
-
+               
                 // Get Claims from token and Build auth user object
                 var tokenContent = _tokenHandler.ReadJwtToken(authResponse.Token);
+               
                 var claims = ParseClaims(tokenContent);
                 var user = new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
 

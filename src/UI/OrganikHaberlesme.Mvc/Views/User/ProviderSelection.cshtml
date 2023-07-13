@@ -36,12 +36,13 @@ else
     <div class="card card-body">
         <form asp-action="ProviderSelection" method="post">
             <input asp-for="Provider" type="hidden" />
+            @Html.ValidationSummary("",new {@class="text-danger"})
             <div class="form-group">
                 <label asp-for="Code" class="control-label"></label>
                 <input asp-for="Code" class="form-control" />
                 <span asp-validation-for="Code" class="text-danger"></span>
             </div>
-            <button class="btn btn-success mt-3" type="submit">Doğrula</button>
+            <button id="btnVerific" class="btn btn-success mt-3"  type="submit">Doğrula</button>
         </form>
 
     </div>
@@ -58,6 +59,10 @@ else
                 console.log(e);
                 $("#Provider").val(e.target.name);
             });
+        });
+
+        $('#btnVerific').click(function (e) {
+            setTimeout(function () { $('#collapseExample').css("display", "block"); }, 3000)
         });
     </script>
 

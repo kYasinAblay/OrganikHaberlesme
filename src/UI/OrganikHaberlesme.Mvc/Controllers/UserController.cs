@@ -87,8 +87,10 @@ namespace OrganikHaberlesme.Mvc.Controllers
         public async Task<IActionResult> ProviderSelection(AuthOptions options, string? returnUrl)
         {
             var authResponse = await _authService.AuthenticateOtp(options);
-            ViewBag.JWTToken = _localStorageService.GetStorageValue<string>("token");
+            if (authResponse == true)
+                ViewBag.JWTToken = _localStorageService.GetStorageValue<string>("token");
 
+            ModelState.AddModelError("","Sending code not compared in selected direction.");
             return View();
         }
         public IActionResult Register()
