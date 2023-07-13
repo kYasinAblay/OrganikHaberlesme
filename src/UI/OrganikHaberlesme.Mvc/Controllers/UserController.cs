@@ -79,7 +79,7 @@ namespace OrganikHaberlesme.Mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProviderSelection(string? returnUrl = null)
+        public IActionResult ProviderSelection(string? returnUrl = null)
         {
             return View();
         }
@@ -99,6 +99,7 @@ namespace OrganikHaberlesme.Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVm registration)
         {// TO DO: geri dönüşler detaylandırılacak
+
             if (ModelState.IsValid)
             {
                 var returnUrl = Url.Content("~/");
@@ -109,7 +110,7 @@ namespace OrganikHaberlesme.Mvc.Controllers
                 }
             }
 
-            ModelState.AddModelError("", "Registration Attempt Failed. Please try again.");
+            ModelState.AddModelError("", "Registration Attempt Failed. Please try again.\n" + _localStorageService.GetStorageValue<string>("Register"));
             return View(registration);
         }
 

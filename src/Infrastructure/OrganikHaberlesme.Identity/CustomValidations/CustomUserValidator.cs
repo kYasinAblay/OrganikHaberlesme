@@ -26,9 +26,10 @@ namespace OrganikHaberlesme.Identity.CustomValidations
             }
 
             var duplicatePhone = manager.Users.Any(x => x.PhoneNumber == user.PhoneNumber);
+
             if (duplicatePhone)
             {
-                errors.Add(new IdentityError() { Code = "UserPhoneNumberDuplicate", Description = "Kullanılan Telefon Numarası" });
+                errors.Add(new IdentityError() { Code = "UserPhoneNumberDuplicate", Description = $"Phone '{user.PhoneNumber}' already exists." });
             }
 
             if (errors.Count == 0)

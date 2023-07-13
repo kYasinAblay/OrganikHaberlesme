@@ -21,7 +21,7 @@ using Newtonsoft.Json;
 using SendGrid;
 using NuGet.Protocol;
 using System.Text.Json;
-
+using System;
 
 namespace OrganikHaberlesme.Mvc.Services
 {
@@ -110,16 +110,25 @@ namespace OrganikHaberlesme.Mvc.Services
 
         public async Task<bool> Register(RegisterVm register)
         {
-            var registrationRequest = _mapper.Map<RegistrationRequest>(register);
-
-            var response = await _client.RegisterAsync(registrationRequest);
-
-            if (string.IsNullOrEmpty(response.UserId))
+            try
             {
+                var registrationRequest = _mapper.Map<RegistrationRequest>(register);
+
+                var response = await _client.RegisterAsync(registrationRequest);
+
+                if (string.IsNullOrEmpty(response.UserId))
+                {
+                    return false;
+                }
+
+                await Authenticate(register.Email, register.Password);
+            }
+            catch (Exception ex)
+            {
+                _localStorage.SetStorageValue<string>("Register", ex.Message);
                 return false;
             }
-
-            await Authenticate(register.Email, register.Password);
+           
             return true;
         }
 

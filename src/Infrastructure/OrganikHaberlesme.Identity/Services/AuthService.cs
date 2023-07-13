@@ -16,6 +16,9 @@ using Microsoft.IdentityModel.Tokens;
 using OrganikHaberlesme.Application.Responses;
 using Microsoft.AspNetCore.Http;
 using OrganikHaberlesme.Application.Models.VerificationCode;
+using OrganikHaberlesme.Application.Exceptions;
+using FluentValidation.Results;
+using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace OrganikHaberlesme.Identity.Services
 {
@@ -107,16 +110,21 @@ namespace OrganikHaberlesme.Identity.Services
 
         public async Task<RegistrationResponse> Register(RegistrationRequest request)
         {
+            var validationResult = new ValidationResult();
+
             var existingUser = await _userManager.FindByNameAsync(request.UserName);
             if (existingUser != null)
             {
-                throw new Exception($"Username '{request.UserName}' already exists.");
+                validationResult.Errors.Add(new ValidationFailure("Duplicate", $"Username '{request.UserName}' already exists."));
+
+                throw new ValidationException(validationResult);
             }
 
             var existingEmail = await _userManager.FindByEmailAsync(request.Email);
             if (existingEmail != null)
             {
-                throw new Exception($"Email '{request.Email} already exists.");
+                validationResult.Errors.Add(new ValidationFailure("Duplicate", $"Email '{request.Email} already exists."));
+                throw new ValidationException(validationResult);
             }
 
             var user = new ApplicationUser
@@ -140,7 +148,21 @@ namespace OrganikHaberlesme.Identity.Services
                     await _userManager.AddToRoleAsync(user, "Employee");
                     return new RegistrationResponse { UserId = user.Id };
                 }
-                throw new Exception($"{result.Errors}");
+
+
+                var errorSb = new StringBuilder();
+                foreach (var error in result.Errors)
+                {
+                    errorSb.Append($"Stack trace {error.Code}: {error.Description}.");
+                }
+
+                validationResult.Errors.Add(new ValidationFailure("Duplicate", errorSb.ToString(), user.Email));
+                throw new ValidationException(validationResult);
+                
+            }
+            catch (ValidationException ex)
+            {
+                throw new ValidationException(validationResult);
             }
             catch (Exception ex)
             {
