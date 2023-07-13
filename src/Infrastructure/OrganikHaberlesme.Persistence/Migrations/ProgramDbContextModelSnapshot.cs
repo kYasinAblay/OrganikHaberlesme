@@ -185,6 +185,7 @@ namespace OrganikHaberlesme.Persistence.Migrations
 
                     b.Navigation("LeaveType");
                 });
+            
 #pragma warning restore 612, 618
         }
     }

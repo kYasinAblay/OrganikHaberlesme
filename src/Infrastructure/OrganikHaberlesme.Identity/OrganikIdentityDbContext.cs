@@ -11,6 +11,7 @@ namespace OrganikHaberlesme.Identity
         public OrganikIdentityDbContext(DbContextOptions<OrganikIdentityDbContext> options) 
             : base(options)
         {
+            
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

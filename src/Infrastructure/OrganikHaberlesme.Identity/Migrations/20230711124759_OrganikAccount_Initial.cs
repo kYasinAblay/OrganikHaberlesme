@@ -222,6 +222,7 @@ namespace OrganikHaberlesme.Identity.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

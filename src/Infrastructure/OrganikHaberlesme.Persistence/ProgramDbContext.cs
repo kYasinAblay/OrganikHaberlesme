@@ -9,6 +9,7 @@ namespace OrganikHaberlesme.Persistence
         public ProgramDbContext(DbContextOptions<ProgramDbContext> options)
             : base(options)
         {
+            
         }
 
         public DbSet<LeaveRequest> LeaveRequests { get; set; }

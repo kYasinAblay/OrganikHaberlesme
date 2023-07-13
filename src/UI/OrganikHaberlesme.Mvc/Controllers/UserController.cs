@@ -98,15 +98,15 @@ namespace OrganikHaberlesme.Mvc.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVm registration)
-        {// TO DO: geri dönüşler detaylandırılacak
-
+        {
             if (ModelState.IsValid)
             {
-                var returnUrl = Url.Content("~/");
+                //var returnUrl = Url.Content("~/");
                 var isCreated = await _authService.Register(registration);
                 if (isCreated)
                 {
-                    return LocalRedirect(returnUrl);
+                    ViewBag.Registered = "Kaydedildi!";
+                    return View();
                 }
             }
 

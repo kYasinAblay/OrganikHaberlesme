@@ -1,13 +1,28 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using OrganikHaberlesme.Identity;
+using OrganikHaberlesme.Persistence;
 
 namespace OrganikHaberlesme.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                await AutomatedMigration.MigrateAsync(scope.ServiceProvider);
+                await AutomatedMigration2.MigrateAsync(scope.ServiceProvider);
+
+            }
+
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
